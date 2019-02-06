@@ -1,48 +1,47 @@
-import Bird from './bird'
+import Bird from './Bird'
+import Counter from './Counter'
+
 export default class Game {
   birds = []
+  counter = 0
 
   constructor() {
     this.createBirds()
+    this.createCounter()
     this.loop()
   }
 
   createBirds() {
-    const config = {
-      removeBird: this.removeBird,
-    } //das this in der Pfeilfunktion bleibt festgebunden an die Klasse in die wir die Pfeilfkt schreiben, das this hier bezieht sich immer auf die Klasse game dadurch alt: this.removeBird.bind
-
-    this.birds = [
-      new Bird({ ...config, color: 'hotpink', speed: 10 }),
-      new Bird(config),
-      new Bird(config),
-      new Bird(config), // 4 birds sind in der Instanz Game und ich kann mit allen Fkt darauf zugreifen
-    ]
+    this.addBird()
+    this.addBird()
+    this.addBird()
+    this.addBird()
   }
 
+  createCounter() {
+    this.counter = new Counter()
+    this.counter.addPlayerPoint()
+    this.counter.addPlayerPoint()
+    this.counter.addBirdsPoint()
+    this.counter.addBirdsPoint()
+    this.counter.addBirdsPoint()
+  }
   addBird() {
     const config = {
       removeBird: this.removeBird,
     }
 
-    this.birds = [...this.birds, new Bird(config)] //neues array mit dem was vorher im array war und einem neuen vogel
-    this.birds.push(new Bird(config)) //nur ein neuer vogel zum alten array
+    this.birds = [...this.birds, new Bird(config)]
+  }
 
-    removeBird = bird => {
-      const index = this.birds.indexOf(bird)
-      this.birds = [
-        ...this.birds.slice(0, index),
-        ...this.birds.slice(index + 1),
-      ]
-      console.log(this.bird)
-    }
+  removeBird = bird => {
+    const index = this.birds.indexOf(bird)
+    this.birds = [...this.birds.slice(0, index), ...this.birds.slice(index + 1)]
   }
 
   loop() {
-    Math.random() < 1 / 60 && this.addBird()
+    this.counter++ % 60 === 0 && this.addBird()
     this.birds.forEach(bird => bird.update())
-    requestAnimationFrame(() => {
-      this.loop()
-    }, 200)
+    requestAnimationFrame(() => this.loop())
   }
 }

@@ -4,4 +4,12 @@
   height: 40px;
   border-radius: 50%; }
 
+.shotbird {
+  background: crimson !important; }
+
+.counter {
+  width: 70px;
+  height: 30px;
+  border: 2px solid black; }
+
 /*# sourceMappingURL=style.css.map */

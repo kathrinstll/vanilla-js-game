@@ -1,18 +1,24 @@
 export default class Bird {
   defaultConfig = {
     color: 'black',
-    speed: 2 + Math.random() * 4,
+    speed: 1 + Math.random() * 2,
     position: 0,
   }
 
   constructor(config) {
     config = { ...this.defaultConfig, ...config }
     const { color, speed, position, removeBird } = config
+
     this.color = color
     this.position = position
     this.removeBird = removeBird
     this.speed = speed
     this.el = this.render()
+    this.addClickHandler()
+  }
+
+  addClickHandler() {
+    this.el.addEventListener('click', () => this.el.classList.add('shotbird'))
   }
 
   update() {
@@ -25,7 +31,6 @@ export default class Bird {
     }
   }
 
-  destroy() {}
   render() {
     const el = document.createElement('div')
     el.className = 'bird'
