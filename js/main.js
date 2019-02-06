@@ -1,1 +1,4 @@
-console.log('Babel works.')
+console.clear()
+import Game from './Game'
+
+new Game()
