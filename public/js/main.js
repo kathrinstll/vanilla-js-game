@@ -115,7 +115,10 @@ function () {
     _defineProperty(this, "defaultConfig", {
       color: 'black',
       speed: 1 + Math.random() * 2,
-      position: 0
+      position: {
+        x: 0,
+        y: 100 + Math.random() * 200
+      }
     });
 
     config = _objectSpread({}, this.defaultConfig, config);
@@ -123,11 +126,16 @@ function () {
         color = _config.color,
         speed = _config.speed,
         position = _config.position,
-        removeBird = _config.removeBird;
+        removeBird = _config.removeBird,
+        onRemove = _config.onRemove,
+        onEscape = _config.onEscape,
+        onClick = _config.onClick;
+    this.onClick = onClick;
     this.color = color;
     this.position = position;
-    this.removeBird = removeBird;
+    this.onRemove = onRemove;
     this.speed = speed;
+    this.onEscape = onEscape;
     this.el = this.render();
     this.addClickHandler();
   }
@@ -138,19 +146,27 @@ function () {
       var _this = this;
 
       this.el.addEventListener('click', function () {
-        return _this.el.classList.add('shotbird');
+        _this.onClick();
+
+        _this.remove();
       });
+    }
+  }, {
+    key: "remove",
+    value: function remove() {
+      this.onRemove(this);
+      this.el.remove();
     }
   }, {
     key: "update",
     value: function update() {
-      this.position = this.position + this.speed;
+      this.position.x = this.position.x + this.speed;
 
-      if (this.position > window.innerWidth) {
-        this.removeBird(this);
-        this.el.remove();
+      if (this.position.x > window.innerWidth) {
+        this.remove();
+        this.onEscape();
       } else {
-        this.el.style.left = this.position + 'px';
+        this.el.style.left = this.position.x + 'px';
       }
     }
   }, {
@@ -158,6 +174,7 @@ function () {
     value: function render() {
       var el = document.createElement('div');
       el.className = 'bird';
+      el.style.top = this.position.y + 'px';
       el.style.background = this.color;
       document.body.insertAdjacentElement('beforeend', el);
       return el;
@@ -281,12 +298,18 @@ function () {
 
     _defineProperty(this, "birds", []);
 
-    _defineProperty(this, "counter", 0);
-
     _defineProperty(this, "removeBird", function (bird) {
       var index = _this.birds.indexOf(bird);
 
       _this.birds = [].concat(_toConsumableArray(_this.birds.slice(0, index)), _toConsumableArray(_this.birds.slice(index + 1)));
+    });
+
+    _defineProperty(this, "updatePlayerPoints", function () {
+      _this.counter.addPlayerPoint();
+    });
+
+    _defineProperty(this, "updateBirdsPoints", function () {
+      _this.counter.addBirdsPoint();
     });
 
     this.createBirds();
@@ -306,17 +329,19 @@ function () {
     key: "createCounter",
     value: function createCounter() {
       this.counter = new _Counter__WEBPACK_IMPORTED_MODULE_1__["default"]();
-      this.counter.addPlayerPoint();
-      this.counter.addPlayerPoint();
-      this.counter.addBirdsPoint();
-      this.counter.addBirdsPoint();
-      this.counter.addBirdsPoint();
+    }
+  }, {
+    key: "createBirds",
+    value: function createBirds() {
+      this.addBird();
     }
   }, {
     key: "addBird",
     value: function addBird() {
       var config = {
-        removeBird: this.removeBird
+        onRemove: this.removeBird,
+        onClick: this.updatePlayerPoints,
+        onEscape: this.updateBirdsPoints
       };
       this.birds = [].concat(_toConsumableArray(this.birds), [new _Bird__WEBPACK_IMPORTED_MODULE_0__["default"](config)]);
     }
@@ -325,7 +350,7 @@ function () {
     value: function loop() {
       var _this2 = this;
 
-      this.counter++ % 60 === 0 && this.addBird();
+      Math.random() < 1 / 60 && this.addBird();
       this.birds.forEach(function (bird) {
         return bird.update();
       });
